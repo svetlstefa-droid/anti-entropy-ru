@@ -34,8 +34,8 @@
   /* затемнение снизу под текст */
   #scrim{position:absolute; inset:0; z-index:2; pointer-events:none; background:linear-gradient(to top, rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 42%);}
   /* диалоговое окно */
-  #box{position:absolute; z-index:6; left:50%; transform:translateX(-50%); bottom:min(4vh,32px);
-      width:min(1040px,92vw); background:var(--box); border:1px solid var(--edge);
+  #box{position:absolute; z-index:6; left:50%; transform:translateX(-50%); bottom:min(4%,32px);
+      width:min(1040px,92%); background:var(--box); border:1px solid var(--edge);
       border-radius:14px; padding:20px 26px 22px; backdrop-filter:blur(3px);
       box-shadow:0 10px 40px rgba(0,0,0,.5);}
   #who{font-family:"Trebuchet MS",sans-serif; font-weight:700; font-size:clamp(15px,2.4vw,20px);
@@ -43,9 +43,9 @@
   #txt{font-size:clamp(16px,2.5vw,21px); line-height:1.6; min-height:3.2em;}
   #txt.narr{font-style:italic; color:#c9d6ec;}
   /* прозаическая вставка (remark/письмо) */
-  #remark{position:absolute; inset:0; z-index:7; display:none; align-items:center; justify-content:center; padding:6vh 5vw;
+  #remark{position:absolute; inset:0; z-index:7; display:none; align-items:center; justify-content:center; padding:6% 5%;
       background:rgba(6,9,16,.86);}
-  #remark .paper{max-width:820px; max-height:82vh; overflow:auto; background:rgba(20,26,40,.9);
+  #remark .paper{max-width:820px; max-height:84%; overflow:auto; background:rgba(20,26,40,.9);
       border:1px solid var(--edge); border-radius:12px; padding:30px 34px; line-height:1.7; font-size:clamp(15px,2.3vw,19px);}
   #remark .paper .h{font-weight:700; color:#9fc0ff; margin:14px 0 4px;}
   #remark .paper p{margin:0 0 12px;}
@@ -94,40 +94,34 @@
       padding:12px 26px; font-size:15px; cursor:pointer; font-family:"Trebuchet MS",sans-serif; outline:none;}
   #resume:hover{background:#37599c;}
 
-  /* ---------- мобильные ---------- */
-  #btnFull{display:none;}
-  @media (pointer:coarse){ #btnFull{display:inline-flex;} }
-  /* телефон в альбоме: мало высоты → всё компактнее */
-  @media (max-height:520px){
-    #hud{padding:6px 8px; gap:6px; font-size:12px;}
-    #hud button{height:26px; min-width:48px; padding:0 9px; font-size:11.5px;}
-    #box{bottom:6px; width:96vw; padding:10px 14px 12px; border-radius:10px;}
-    #who{font-size:14px; margin-bottom:4px;}
-    #txt{font-size:15px; line-height:1.45; min-height:2.9em;}
-    #cont{right:14px; bottom:8px; font-size:15px;}
-    #noteBtn{top:-13px; right:12px; font-size:11px; padding:3px 9px;}
-    #remark{padding:3vh 3vw;}
-    #remark .paper{padding:14px 16px; max-height:92vh; font-size:14px; line-height:1.5;}
-  }
-  /* телефон в портрете: арт полосой 16:9 сверху (без обрезки), текст под ним */
-  @media (orientation:portrait) and (max-width:900px){
-    :root{ --hudH:44px; --artH:56.25vw; }
-    #stage{background:#05070d;}
-    #bgFallback,#bg,#sprites{top:var(--hudH); height:var(--artH); bottom:auto;}
-    #scrim{display:none;}
-    #hud{padding:8px 8px; gap:6px; flex-wrap:wrap; background:rgba(0,0,0,.55); height:var(--hudH);}
-    #hud button{height:28px; min-width:0; padding:0 9px; font-size:11.5px;}
-    #prog{font-size:11px;}
-    #box{top:calc(var(--hudH) + var(--artH) + 10px); bottom:auto; width:94vw; padding:14px 16px 18px;
-         max-height:calc(100vh - var(--hudH) - var(--artH) - 20px); overflow:auto;}
-    #who{font-size:15px;}
-    #txt{font-size:16px; line-height:1.5; min-height:4em;}
-    #cont{right:12px; bottom:6px; font-size:15px;}
-    #noteBtn{top:-13px; right:12px; font-size:11px; padding:3px 9px;}
-    #remark{padding:2vh 3vw; align-items:flex-start;}
-    #remark .paper{padding:16px 16px; max-height:94vh; font-size:15px; line-height:1.55;}
-    #menu{padding:4vh 4vw;}
-  }
+  /* ---------- раскладка арта (считается в JS: layout()) ----------
+     арт всегда 16:9 целиком, без обрезки: в альбоме — по высоте, с полями по бокам (пилларбокс),
+     в портрете — полосой сверху, текст под ним. Переменные --artT/--artL/--artW/--artH ставит JS. */
+  #bgFallback,#bg,#sprites{top:var(--artT,0); left:var(--artL,0); width:var(--artW,100%); height:var(--artH,100%);
+      right:auto; bottom:auto;}
+  body.portrait #scrim{display:none;}
+  body.portrait #box{top:calc(var(--artT) + var(--artH) + 10px); bottom:auto; width:94vw; padding:14px 16px 18px;
+      max-height:calc(100% - var(--artT) - var(--artH) - 20px); overflow:auto;}
+  body.portrait #hud{padding:8px 8px; gap:6px; background:rgba(0,0,0,.55);}
+  body.portrait #who{font-size:15px;}
+  body.portrait #txt{font-size:16px; line-height:1.5; min-height:4em;}
+  body.portrait #menu{padding:4vh 4vw;}
+  /* мало высоты (телефон в альбоме) → компактнее */
+  body.compact #hud{padding:6px 8px; gap:6px; font-size:12px;}
+  body.compact #hud button,body.portrait #hud button{height:26px; min-width:0; padding:0 9px; font-size:11.5px;}
+  body.compact #prog,body.portrait #prog{font-size:11px;}
+  body.compact #box{bottom:6px; width:96%; padding:10px 14px 12px; border-radius:10px;}
+  body.compact #who{font-size:14px; margin-bottom:4px;}
+  body.compact #txt{font-size:15px; line-height:1.45; min-height:2.9em;}
+  body.compact #cont,body.portrait #cont{right:12px; bottom:7px; font-size:15px;}
+  body.compact #noteBtn,body.portrait #noteBtn{top:-13px; right:12px; font-size:11px; padding:3px 9px;}
+  body.compact #remark,body.portrait #remark{padding:2% 3%;}
+  body.compact #remark .paper,body.portrait #remark .paper{padding:14px 16px; max-height:94%; font-size:14.5px; line-height:1.5;}
+  /* кнопки только для тач-экранов */
+  #btnFull,#btnRot{display:none;}
+  @media (pointer:coarse){ #btnFull,#btnRot{display:inline-flex;} }
+  /* программный поворот сцены на 90° (для webview без полноэкранного режима, напр. HoYoLab) */
+  body.rot #stage{transform-origin:0 0; transform:rotate(90deg) translate(0,-100%);}
   #stage:fullscreen{background:#05070d;}
   .hidden{display:none !important;}
 </style>
@@ -145,6 +139,7 @@
     <button id="btnAuto">Авто</button>
     <button id="btnMusic">Звук</button>
     <button id="btnLang">RU</button>
+    <button id="btnRot">⟳</button>
     <button id="btnFull">⛶</button>
     <span class="sp"></span>
     <span id="prog"></span>
@@ -493,16 +488,37 @@ window.AE_DATA = {"cdn": "https://act-webstatic.mihoyo.com/event_bh3_com/avg-ant
     if(S.auto && !S.typing) next(); else clearTimeout(S.autoT); };
 
 
-  // ---- полный экран + поворот в альбом (телефон) ----
+  // ---- раскладка: арт 16:9 целиком; портрет/альбом; программный поворот ----
+  const HUD_H = 44;
+  function layout(){
+    const rot = document.body.classList.contains("rot");
+    let W = window.innerWidth, H = window.innerHeight;
+    if(rot){ stage.style.width=H+"px"; stage.style.height=W+"px"; [W,H]=[H,W]; }
+    else { stage.style.width=""; stage.style.height=""; }
+    const portrait = W < H;
+    document.body.classList.toggle("portrait", portrait);
+    document.body.classList.toggle("compact", !portrait && H < 520);
+    let aw, ah, at, al;
+    if(portrait){ aw=W; ah=Math.round(W*9/16); at=HUD_H; al=0; }
+    else { ah=Math.min(H, Math.round(W*9/16)); aw=Math.round(ah*16/9); at=Math.round((H-ah)/2); al=Math.round((W-aw)/2); }
+    const r=document.documentElement.style;
+    r.setProperty("--artT",at+"px"); r.setProperty("--artL",al+"px"); r.setProperty("--artW",aw+"px"); r.setProperty("--artH",ah+"px");
+  }
+  window.addEventListener("resize", layout);
+  if(window.visualViewport) window.visualViewport.addEventListener("resize", layout);
+  if(screen.orientation) screen.orientation.addEventListener("change", ()=>setTimeout(layout,60));
+  layout();
+  S.$("btnRot").onclick=()=>{ document.body.classList.toggle("rot"); S.$("btnRot").classList.toggle("active", document.body.classList.contains("rot")); layout(); };
+  // ---- полный экран + поворот в альбом через API (где он есть) ----
   S.$("btnFull").onclick=()=>{
     const el=document.documentElement;
     const fs = document.fullscreenElement || document.webkitFullscreenElement;
     if(fs){ (document.exitFullscreen||document.webkitExitFullscreen).call(document); try{ screen.orientation.unlock(); }catch(e){} return; }
     const req = el.requestFullscreen||el.webkitRequestFullscreen;
-    const p = req ? req.call(el) : Promise.reject();
-    Promise.resolve(p).then(()=>{ try{ screen.orientation.lock("landscape").catch(()=>{}); }catch(e){} }).catch(()=>{});
+    if(!req){ document.body.classList.add("rot"); S.$("btnRot").classList.add("active"); layout(); return; }  // нет API → программный поворот
+    Promise.resolve(req.call(el)).then(()=>{ try{ screen.orientation.lock("landscape").catch(()=>{}); }catch(e){} setTimeout(layout,100); }).catch(()=>{});
   };
-  document.addEventListener("fullscreenchange",()=>{ S.$("btnFull").classList.toggle("active", !!document.fullscreenElement); });
+  document.addEventListener("fullscreenchange",()=>{ S.$("btnFull").classList.toggle("active", !!document.fullscreenElement); layout(); });
 
   buildMenu();
 })();
