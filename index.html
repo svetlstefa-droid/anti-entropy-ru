@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Anti-Entropy VN — читалка</title>
 <style>
   :root{ --box:rgba(12,16,28,.82); --edge:rgba(120,180,255,.35); --ink:#eaf1ff; }
@@ -93,6 +93,42 @@
   #resume{display:block; margin:8px auto 26px; background:#2a4a86; color:#fff; border:none; border-radius:10px;
       padding:12px 26px; font-size:15px; cursor:pointer; font-family:"Trebuchet MS",sans-serif; outline:none;}
   #resume:hover{background:#37599c;}
+
+  /* ---------- мобильные ---------- */
+  #btnFull{display:none;}
+  @media (pointer:coarse){ #btnFull{display:inline-flex;} }
+  /* телефон в альбоме: мало высоты → всё компактнее */
+  @media (max-height:520px){
+    #hud{padding:6px 8px; gap:6px; font-size:12px;}
+    #hud button{height:26px; min-width:48px; padding:0 9px; font-size:11.5px;}
+    #box{bottom:6px; width:96vw; padding:10px 14px 12px; border-radius:10px;}
+    #who{font-size:14px; margin-bottom:4px;}
+    #txt{font-size:15px; line-height:1.45; min-height:2.9em;}
+    #cont{right:14px; bottom:8px; font-size:15px;}
+    #noteBtn{top:-13px; right:12px; font-size:11px; padding:3px 9px;}
+    #remark{padding:3vh 3vw;}
+    #remark .paper{padding:14px 16px; max-height:92vh; font-size:14px; line-height:1.5;}
+  }
+  /* телефон в портрете: арт полосой 16:9 сверху (без обрезки), текст под ним */
+  @media (orientation:portrait) and (max-width:900px){
+    :root{ --hudH:44px; --artH:56.25vw; }
+    #stage{background:#05070d;}
+    #bgFallback,#bg,#sprites{top:var(--hudH); height:var(--artH); bottom:auto;}
+    #scrim{display:none;}
+    #hud{padding:8px 8px; gap:6px; flex-wrap:wrap; background:rgba(0,0,0,.55); height:var(--hudH);}
+    #hud button{height:28px; min-width:0; padding:0 9px; font-size:11.5px;}
+    #prog{font-size:11px;}
+    #box{top:calc(var(--hudH) + var(--artH) + 10px); bottom:auto; width:94vw; padding:14px 16px 18px;
+         max-height:calc(100vh - var(--hudH) - var(--artH) - 20px); overflow:auto;}
+    #who{font-size:15px;}
+    #txt{font-size:16px; line-height:1.5; min-height:4em;}
+    #cont{right:12px; bottom:6px; font-size:15px;}
+    #noteBtn{top:-13px; right:12px; font-size:11px; padding:3px 9px;}
+    #remark{padding:2vh 3vw; align-items:flex-start;}
+    #remark .paper{padding:16px 16px; max-height:94vh; font-size:15px; line-height:1.55;}
+    #menu{padding:4vh 4vw;}
+  }
+  #stage:fullscreen{background:#05070d;}
   .hidden{display:none !important;}
 </style>
 </head>
@@ -109,6 +145,7 @@
     <button id="btnAuto">Авто</button>
     <button id="btnMusic">Звук</button>
     <button id="btnLang">RU</button>
+    <button id="btnFull">⛶</button>
     <span class="sp"></span>
     <span id="prog"></span>
   </div>
@@ -454,6 +491,18 @@ window.AE_DATA = {"cdn": "https://act-webstatic.mihoyo.com/event_bh3_com/avg-ant
   document.querySelectorAll("#hud button").forEach(b=>b.addEventListener("click",()=>b.blur()));
   S.$("btnAuto").onclick=()=>{ S.auto=!S.auto; S.$("btnAuto").classList.toggle("active", S.auto);
     if(S.auto && !S.typing) next(); else clearTimeout(S.autoT); };
+
+
+  // ---- полный экран + поворот в альбом (телефон) ----
+  S.$("btnFull").onclick=()=>{
+    const el=document.documentElement;
+    const fs = document.fullscreenElement || document.webkitFullscreenElement;
+    if(fs){ (document.exitFullscreen||document.webkitExitFullscreen).call(document); try{ screen.orientation.unlock(); }catch(e){} return; }
+    const req = el.requestFullscreen||el.webkitRequestFullscreen;
+    const p = req ? req.call(el) : Promise.reject();
+    Promise.resolve(p).then(()=>{ try{ screen.orientation.lock("landscape").catch(()=>{}); }catch(e){} }).catch(()=>{});
+  };
+  document.addEventListener("fullscreenchange",()=>{ S.$("btnFull").classList.toggle("active", !!document.fullscreenElement); });
 
   buildMenu();
 })();
